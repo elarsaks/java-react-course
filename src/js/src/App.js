@@ -1,11 +1,20 @@
 import React, { Component } from "react";
+import Container from "./Container";
 import "./App.css";
 import { getAllStudents } from "./client";
+import { 
+  Table,
+  Avatar,
+  Spin,
+} from "antd";
+import { LoadingOutlined } from '@ant-design/icons'
 
+const getIndicatorIcon = () => <LoadingOutlined type='loading' style={{fontSize: 24}} spin />
 class App extends Component {
 
   state = {
-    students: []
+    students: [],
+    isFetching: false
   }
 
   componentDidMount () {
@@ -13,30 +22,79 @@ class App extends Component {
   }
 
   fetchStudents = () => {
+    this.setState({
+      isFetching: true
+    })
     getAllStudents().then((res) => {
       res.json().then((students) => {
         this.setState({
-          students
+          students,
+          isFetching: false
         })
       });
     });
   }
   render() {
-    const {students} = this.state
-    console.log(students)
+    const {isFetching, students} = this.state
+
+    if(isFetching){
+      return (
+        <Container>
+          <Spin indicator={getIndicatorIcon()}/>
+        </Container>
+      )
+    }
 
     if (students && students.length){
-      return students.map((student, index) => {
-        return <div key={index}>
-          <h2> {student.studentId} </h2>
-          <p> {student.firstName} </p>
-          <p> {student.lastName} </p>
-          <p> {student.gender} </p>
-          <p> {student.email} </p>
-        </div>
-      })
+        const columns = [
+          {
+            title: 'empty',
+            key: 'avatar',
+            render: (text, student) => (
+              <Avatar>
+                {`
+                  ${student.firstName.charAt(0).toUpperCase()}
+                  ${student.lastName.charAt(0).toUpperCase()}               
+                `}
+              </Avatar>
+            )
+          },
+          {
+            title: 'Student Id',
+            dataIndex: 'studentId',
+            key: 'studentId'
+          },
+          {
+            title: 'First Name',
+            dataIndex: 'firstName',
+            key: 'firstName'
+          },
+          {
+            title: 'Last Name',
+            dataIndex: 'lastName',
+            key: 'lastName'
+          },
+          {
+            title: 'Email',
+            dataIndex: 'email',
+            key: 'email'
+          },
+          {
+            title: 'Gender',
+            dataIndex: 'gender',
+            key: 'gender'
+          }
+        ]
+
+        return <Container>
+          <Table 
+            dataSource={students} 
+            columns={columns}
+            pagination={false}
+            rowKey='studentId'/>
+        </Container> 
     }
-    return <h1> No students found!</h1>;
+    return <h1>No Students Found!</h1>
   }
 }
 
