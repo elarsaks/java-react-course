@@ -1,0 +1,4 @@
+server: 
+  servlet:
+    context-path: /api
+    # Yaml file not working. Learn it when you get better with Java Spring!
