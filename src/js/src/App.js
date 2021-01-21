@@ -3,13 +3,40 @@ import "./App.css";
 import { getAllStudents } from "./client";
 
 class App extends Component {
-  render() {
+
+  state = {
+    students: []
+  }
+
+  componentDidMount () {
+    this.fetchStudents()
+  }
+
+  fetchStudents = () => {
     getAllStudents().then((res) => {
       res.json().then((students) => {
-        console.log(students);
+        this.setState({
+          students
+        })
       });
     });
-    return <h1> Hello world!</h1>;
+  }
+  render() {
+    const {students} = this.state
+    console.log(students)
+
+    if (students && students.length){
+      return students.map((student, index) => {
+        return <div key={index}>
+          <h2> {student.studentId} </h2>
+          <p> {student.firstName} </p>
+          <p> {student.lastName} </p>
+          <p> {student.gender} </p>
+          <p> {student.email} </p>
+        </div>
+      })
+    }
+    return <h1> No students found!</h1>;
   }
 }
 
